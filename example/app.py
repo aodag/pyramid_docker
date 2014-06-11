@@ -5,8 +5,17 @@ from pyramid.config import Configurator
 def index(context, request):
     return dict()
 
+
 def containers(context, request):
     return dict()
+
+class ContainerView(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self):
+        return dict()
 
 
 def main():
@@ -21,6 +30,9 @@ def main():
     config.add_view(containers,
                     context='pyramid_docker.resources.DockerContainerCollection',
                     renderer="containers.mako")
+    config.add_view(ContainerView,
+                    context='pyramid_docker.resources.DockerContainerResource',
+                    renderer='container.mako')
     app = config.make_wsgi_app()
     httpd = make_server('', 8080, app)
     httpd.serve_forever()
