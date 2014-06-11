@@ -13,4 +13,21 @@ class DockerContainerCollection(object):
         self.client = client
 
     def __iter__(self):
-        return iter(self.client.containers())
+        return iter(DockerContainerResource(self, c)
+                    for c in self.client.containers())
+
+    def __getitem__(self, key):
+        for c in self.client.containers():
+            if c['Id'] == key:
+                return DockerContainerResource(self, c)
+        raise KeyError(key)
+
+
+class DockerContainerResource(object):
+    def __init__(self, parent, container_data):
+        self.__parent__ = parent
+        self.__name__ = container_data['Id']
+        self.data = container_data
+
+    def __str__(self):
+        return ",".join(self.data["Names"])
